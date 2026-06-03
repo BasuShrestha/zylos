@@ -1,0 +1,32 @@
+name: zylos
+description: "A new Flutter project."
+
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  just_audio: ^0.10.5
+  audio_service: ^0.18.18
+  audio_metadata_reader: ^1.6.0
+  flutter_riverpod: ^3.3.1
+  sqflite: ^2.4.3
+  path: ^1.9.1
+  permission_handler: ^12.0.3
+  path_provider: ^2.1.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
