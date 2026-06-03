@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zylos/providers/player_provider.dart';
 
 import '../../../providers/song_provider.dart';
 
@@ -9,6 +10,9 @@ class SongsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final songsAsync = ref.watch(songsProvider);
+
+    final currentSong = ref.watch(playerProvider.select((s) => s.currentSong));
+    final isPlaying = ref.watch(playerProvider.select((s) => s.isPlaying));
 
     return Scaffold(
       appBar: AppBar(
@@ -32,7 +36,6 @@ class SongsScreen extends ConsumerWidget {
             ],
           ),
         ),
-
         error: (e, _) => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -49,7 +52,6 @@ class SongsScreen extends ConsumerWidget {
             ],
           ),
         ),
-
         data: (songs) {
           if (songs.isEmpty) {
             return const Center(
@@ -65,20 +67,41 @@ class SongsScreen extends ConsumerWidget {
           }
 
           return ListView.builder(
+            padding: const EdgeInsets.only(bottom: 80),
             itemCount: songs.length,
             itemBuilder: (context, index) {
               final song = songs[index];
+              final isCurrentSong = currentSong?.path == song.path;
+
               return ListTile(
+                tileColor: isCurrentSong
+                    ? Theme.of(context).colorScheme.primaryContainer
+                    : null,
                 leading: CircleAvatar(
-                  child: Text(
-                    song.title[0].toUpperCase(),
-                    style: const TextStyle(fontSize: 14),
-                  ),
+                  backgroundColor: isCurrentSong
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
+                  child: isCurrentSong
+                      ? Icon(
+                          isPlaying ? Icons.pause : Icons.play_arrow,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          size: 20,
+                        )
+                      : Text(
+                          song.title[0].toUpperCase(),
+                          style: const TextStyle(fontSize: 14),
+                        ),
                 ),
                 title: Text(
                   song.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  style: isCurrentSong
+                      ? TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: .w600,
+                        )
+                      : null,
                 ),
                 subtitle: Text(
                   song.artist,
@@ -89,7 +112,13 @@ class SongsScreen extends ConsumerWidget {
                   song.formattedDuration,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
-                onTap: () {},
+                onTap: () {
+                  if (isCurrentSong) {
+                    ref.read(playerProvider.notifier).togglePlayPause();
+                  } else {
+                    ref.read(playerProvider.notifier).playSong(songs, index);
+                  }
+                },
               );
             },
           );
