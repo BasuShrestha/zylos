@@ -84,6 +84,7 @@ class SongRepository {
           'path': file.path,
           'file_size': file.lengthSync(),
           'date_added': file.lastModifiedSync().millisecondsSinceEpoch,
+          'track_number': metadata.trackNumber ?? 0,
         };
 
         batch.insert('songs', map, conflictAlgorithm: ConflictAlgorithm.ignore);
@@ -95,6 +96,7 @@ class SongRepository {
     await batch.commit(noResult: true);
 
     final saved = await db.query('songs', orderBy: 'title COLLATE NOCASE ASC');
+    print('DEBUG: sample song: $saved');
 
     return saved.map(SongModel.fromMap).toList();
   }

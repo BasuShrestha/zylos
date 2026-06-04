@@ -1,75 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zylos/providers/player_provider.dart';
 import 'package:zylos/ui/screens/now_playing_screen.dart';
 
-import '../../../providers/song_provider.dart';
+import '../../../data/models/genre_model.dart';
+import '../../../providers/library_provider.dart';
+import '../../../providers/player_provider.dart';
 
-class SongsScreen extends ConsumerWidget {
-  const SongsScreen({super.key});
+class GenreDetailScreen extends ConsumerWidget {
+  final GenreModel genre;
+
+  const GenreDetailScreen({super.key, required this.genre});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final songsAsync = ref.watch(songsProvider);
-
+    final songsAsync = ref.watch(songsForGenreProvider(genre.name));
     final currentSong = ref.watch(playerProvider.select((s) => s.currentSong));
     final isPlaying = ref.watch(playerProvider.select((s) => s.isPlaying));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zylos'),
+        title: Text(genre.name),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.invalidate(songsProvider),
-          ),
+          if (songsAsync.value?.isNotEmpty == true)
+            IconButton(
+              icon: const Icon(Icons.play_arrow_rounded),
+              onPressed: () => ref
+                  .read(playerProvider.notifier)
+                  .playSong(songsAsync.value!, 0),
+            ),
         ],
       ),
+      body: Builder(
+        builder: (context) {
+          if (songsAsync.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-      body: songsAsync.when(
-        loading: () => const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Scanning your music...'),
-            ],
-          ),
-        ),
-        error: (e, _) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.error_outline, size: 48),
-              const SizedBox(height: 12),
-              const Text('Could not load songs.'),
-              const SizedBox(height: 8),
-              Text(
-                e.toString(),
-                style: Theme.of(context).textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-        data: (songs) {
+          if (songsAsync.hasError) {
+            return Center(child: Text('Error: ${songsAsync.error}'));
+          }
+
+          final songs = songsAsync.value ?? [];
+
           if (songs.isEmpty) {
             return const Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.music_off, size: 48),
+                  Icon(Icons.queue_music_outlined, size: 48),
                   SizedBox(height: 12),
-                  Text('No songs found on device.'),
+                  Text('No songs in this genre.'),
                 ],
               ),
             );
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.only(bottom: 90),
             itemCount: songs.length,
+            padding: const EdgeInsets.only(bottom: 90),
             itemBuilder: (context, index) {
               final song = songs[index];
               final isCurrentSong = currentSong?.path == song.path;
@@ -100,12 +88,12 @@ class SongsScreen extends ConsumerWidget {
                   style: isCurrentSong
                       ? TextStyle(
                           color: Theme.of(context).colorScheme.primary,
-                          fontWeight: .w600,
+                          fontWeight: FontWeight.w600,
                         )
                       : null,
                 ),
                 subtitle: Text(
-                  song.artist,
+                  '${song.artist} · ${song.album}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -122,7 +110,6 @@ class SongsScreen extends ConsumerWidget {
                         fullscreenDialog: true,
                       ),
                     );
-                    // ref.read(playerProvider.notifier).togglePlayPause();
                   } else {
                     ref.read(playerProvider.notifier).playSong(songs, index);
                   }
