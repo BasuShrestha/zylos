@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:zylos/ui/screens/albums/albums_screen.dart';
+import 'package:zylos/ui/screens/artists/artists_screen.dart';
+import 'package:zylos/ui/screens/genres/genres_screen.dart';
 import 'package:zylos/ui/screens/songs/songs_screen.dart';
 import 'package:zylos/ui/widgets/mini_player.dart';
 
@@ -10,7 +12,12 @@ final currentTabProvider = StateProvider<int>((ref) => 0);
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  static const _screens = [SongsScreen(), AlbumsScreen()];
+  static const _screens = [
+    SongsScreen(),
+    AlbumsScreen(),
+    ArtistsScreen(),
+    GenresScreen(),
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

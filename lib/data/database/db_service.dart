@@ -24,7 +24,8 @@ class DBService {
         duration    INTEGER NOT NULL,
         path        TEXT NOT NULL UNIQUE,
         file_size   INTEGER NOT NULL,
-        date_added  INTEGER NOT NULL
+        date_added  INTEGER NOT NULL,
+        track_number INTEGER NOT NULL DEFAULT 0
       )
     ''');
 

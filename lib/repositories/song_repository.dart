@@ -96,6 +96,7 @@ class SongRepository {
     await batch.commit(noResult: true);
 
     final saved = await db.query('songs', orderBy: 'title COLLATE NOCASE ASC');
+    print('DEBUG: sample song: $saved');
 
     return saved.map(SongModel.fromMap).toList();
   }
