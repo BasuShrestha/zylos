@@ -84,6 +84,7 @@ class SongRepository {
           'path': file.path,
           'file_size': file.lengthSync(),
           'date_added': file.lastModifiedSync().millisecondsSinceEpoch,
+          'track_number': metadata.trackNumber ?? 0,
         };
 
         batch.insert('songs', map, conflictAlgorithm: ConflictAlgorithm.ignore);

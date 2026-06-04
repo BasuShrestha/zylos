@@ -10,6 +10,7 @@ class SongModel {
   final String path;
   final int fileSize;
   final int dateAdded;
+  final int trackNumber;
 
   const SongModel({
     required this.id,
@@ -21,6 +22,7 @@ class SongModel {
     required this.path,
     required this.fileSize,
     required this.dateAdded,
+    required this.trackNumber,
   });
 
   factory SongModel.fromMap(Map<String, dynamic> map) {
@@ -34,6 +36,7 @@ class SongModel {
       path: map['path'] as String,
       fileSize: map['file_size'] as int,
       dateAdded: map['date_added'] as int,
+      trackNumber: map['track_number'] as int,
     );
   }
 
@@ -47,6 +50,7 @@ class SongModel {
       'path': path,
       'file_size': fileSize,
       'date_added': dateAdded,
+      'track_number': trackNumber,
     };
   }
 

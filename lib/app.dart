@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ui/screens/songs/songs_screen.dart';
+import 'package:zylos/ui/screens/home/home_screen.dart';
 
 class Zylos extends StatelessWidget {
   const Zylos({super.key});
@@ -12,7 +12,7 @@ class Zylos extends StatelessWidget {
       themeMode: ThemeMode.dark,
       darkTheme: ThemeData.dark(useMaterial3: true),
       theme: ThemeData.light(useMaterial3: true),
-      home: const SongsScreen(),
+      home: const HomeScreen(),
     );
   }
 }
