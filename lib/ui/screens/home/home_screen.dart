@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:zylos/ui/screens/albums/albums_screen.dart';
 import 'package:zylos/ui/screens/artists/artists_screen.dart';
 import 'package:zylos/ui/screens/genres/genres_screen.dart';
+import 'package:zylos/ui/screens/search/search_screen.dart';
 import 'package:zylos/ui/screens/songs/songs_screen.dart';
 import 'package:zylos/ui/widgets/mini_player.dart';
 
@@ -24,6 +25,18 @@ class HomeScreen extends ConsumerWidget {
     final currentTab = ref.watch(currentTabProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Zylos'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SearchScreen()),
+            ),
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           IndexedStack(index: currentTab, children: _screens),

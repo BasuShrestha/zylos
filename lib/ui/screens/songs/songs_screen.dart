@@ -17,7 +17,7 @@ class SongsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zylos'),
+        title: const Text('All Songs'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
