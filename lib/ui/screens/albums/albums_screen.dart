@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zylos/providers/library_provider.dart';
 import 'package:zylos/ui/screens/albums/album_detail_screen.dart';
+import 'package:zylos/ui/widgets/artwork_widget.dart';
 
 class AlbumsScreen extends ConsumerWidget {
   const AlbumsScreen({super.key});
@@ -49,21 +50,30 @@ class AlbumsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: .start,
                   children: [
+                    // Expanded(
+                    //   child: Container(
+                    //     decoration: BoxDecoration(
+                    //       color: Theme.of(context).colorScheme.primaryContainer,
+                    //       borderRadius: BorderRadius.circular(12),
+                    //     ),
+                    //     child: Center(
+                    //       child: Icon(
+                    //         Icons.album,
+                    //         size: 48,
+                    //         color: Theme.of(
+                    //           context,
+                    //         ).colorScheme.primaryContainer,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                     Expanded(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.album,
-                            size: 48,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.primaryContainer,
-                          ),
-                        ),
+                      child: ArtworkWidget(
+                        artworkPath: album.artworkPath, // ← see note below
+                        size: double.infinity,
+                        borderRadius: BorderRadius.circular(12),
+                        fallbackIcon: Icons.album,
+                        fallbackIconSize: 48,
                       ),
                     ),
                     const SizedBox(height: 8),

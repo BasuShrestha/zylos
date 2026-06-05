@@ -10,7 +10,12 @@ class DBService {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'zylos.db');
 
-    _db = await openDatabase(path, version: 1, onCreate: _onCreate);
+    _db = await openDatabase(
+      path,
+      version: 2,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
   }
 
   static Future<void> _onCreate(Database db, int version) async {
@@ -25,13 +30,26 @@ class DBService {
         path        TEXT NOT NULL UNIQUE,
         file_size   INTEGER NOT NULL,
         date_added  INTEGER NOT NULL,
-        track_number INTEGER NOT NULL DEFAULT 0
+        track_number INTEGER NOT NULL DEFAULT 0,
+        artwork_path TEXT NOT NULL DEFAULT ""
       )
     ''');
 
     await db.execute('CREATE INDEX idx_title  ON songs(title  COLLATE NOCASE)');
     await db.execute('CREATE INDEX idx_artist ON songs(artist COLLATE NOCASE)');
     await db.execute('CREATE INDEX idx_album  ON songs(album  COLLATE NOCASE)');
+  }
+
+  static Future<void> _onUpgrade(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        'ALTER TABLE songs ADD COLUMN artwork_path TEXT NOT NULL DEFAULT ""',
+      );
+    }
   }
 
   static Database get instance {
