@@ -46,8 +46,8 @@ class ZylosAudioHandler {
       );
     }).toList();
 
-    await _player.setAudioSource(
-      ConcatenatingAudioSource(children: sources),
+    await _player.setAudioSources(
+      sources,
       initialIndex: startIndex,
       initialPosition: Duration.zero,
     );
