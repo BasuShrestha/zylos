@@ -34,7 +34,18 @@ class PlayerNotifier extends StateNotifier<PlayerStateModel> {
       state = state.copyWith(isPlaying: isPlaying);
     });
 
-    // Auto advance to next song when current finishes
+    _handler.currentIndexStream.listen((index) {
+      if (index == null) return;
+      if (index == state.currentIndex) return;
+      if (index < 0 || index >= state.queue.length) return;
+
+      state = state.copyWith(
+        currentIndex: index,
+        currentSong: state.queue[index],
+        position: Duration.zero,
+      );
+    });
+
     _handler.processingStateStream.listen((processingState) {
       if (processingState == ProcessingState.completed) {
         next();
@@ -50,7 +61,7 @@ class PlayerNotifier extends StateNotifier<PlayerStateModel> {
       currentIndex: index,
       position: Duration.zero,
     );
-    await _handler.playFromSong(song);
+    await _handler.playQueue(queue, index);
   }
 
   Future<void> togglePlayPause() async {

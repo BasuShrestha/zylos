@@ -1,25 +1,70 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import '../data/models/song_model.dart';
 
 class ZylosAudioHandler {
-  // Single AudioPlayer instance — never recreated
   final _player = AudioPlayer();
 
-  // Expose streams for PlayerNotifier to listen to
   Stream<Duration> get positionStream => _player.positionStream;
   Stream<Duration?> get durationStream => _player.durationStream;
   Stream<bool> get playingStream => _player.playingStream;
   Stream<ProcessingState> get processingStateStream =>
       _player.processingStateStream;
 
-  Future<void> playFromSong(SongModel song) async {
-    await _player.setFilePath(song.path);
+  Stream<int?> get currentIndexStream => _player.currentIndexStream;
+
+  // Future<void> playFromSong(SongModel song) async {
+  //   await _player.setAudioSource(
+  //     AudioSource.file(
+  //       song.path,
+  //       tag: MediaItem(
+  //         id: song.path,
+  //         title: song.title,
+  //         artist: song.artist,
+  //         album: song.album,
+  //         duration: Duration(milliseconds: song.duration),
+  //         artUri: song.hasArtwork ? Uri.file(song.artworkPath) : null,
+  //       ),
+  //     ),
+  //   );
+  //   // await _player.setFilePath(song.path);
+  //   await _player.play();
+  // }
+
+  Future<void> playQueue(List<SongModel> songs, int startIndex) async {
+    final sources = songs.map((song) {
+      return AudioSource.file(
+        song.path,
+        tag: MediaItem(
+          id: song.path,
+          title: song.title,
+          artist: song.artist,
+          album: song.album,
+          duration: Duration(milliseconds: song.duration),
+          artUri: song.hasArtwork ? Uri.file(song.artworkPath) : null,
+        ),
+      );
+    }).toList();
+
+    await _player.setAudioSource(
+      ConcatenatingAudioSource(children: sources),
+      initialIndex: startIndex,
+      initialPosition: Duration.zero,
+    );
+
     await _player.play();
   }
 
   Future<void> play() => _player.play();
   Future<void> pause() => _player.pause();
   Future<void> seek(Duration position) => _player.seek(position);
+
+  Future<void> seekToNext() => _player.seekToNext();
+  Future<void> seekToPrevious() => _player.seekToPrevious();
+
+  Future<void> seekToIndex(int index) async {
+    await _player.seek(Duration.zero, index: index);
+  }
 
   Future<void> stop() async {
     await _player.stop();
