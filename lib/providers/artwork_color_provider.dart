@@ -6,12 +6,6 @@ import 'package:palette_generator/palette_generator.dart';
 
 import 'player_provider.dart';
 
-// ─────────────────────────────────────────────
-// Extracts dominant color from current song's
-// artwork and builds a ColorScheme from it.
-// Returns null if no artwork — UI falls back
-// to default theme.
-// ─────────────────────────────────────────────
 final artworkColorProvider = FutureProvider<ColorScheme?>((ref) async {
   final song = ref.watch(playerProvider.select((s) => s.currentSong));
 
@@ -36,3 +30,27 @@ final artworkColorProvider = FutureProvider<ColorScheme?>((ref) async {
     return null;
   }
 });
+
+final colorSchemeNotifierProvider =
+    NotifierProvider<ColorSchemeNotifier, ColorScheme>(ColorSchemeNotifier.new);
+
+class ColorSchemeNotifier extends Notifier<ColorScheme> {
+  static final _defaultScheme = ColorScheme.fromSeed(
+    seedColor: Colors.deepPurple,
+    brightness: Brightness.dark,
+  );
+
+  @override
+  ColorScheme build() {
+    ref.listen(artworkColorProvider, (_, next) {
+      next.whenData((scheme) {
+        if (scheme != null) {
+          state = scheme;
+        } else {
+          state = _defaultScheme;
+        }
+      });
+    });
+    return _defaultScheme;
+  }
+}
