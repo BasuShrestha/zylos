@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import '../data/models/song_model.dart';
+import '../data/models/player_state_model.dart';
 
 class ZylosAudioHandler {
   final _player = AudioPlayer();
@@ -12,24 +13,6 @@ class ZylosAudioHandler {
       _player.processingStateStream;
 
   Stream<int?> get currentIndexStream => _player.currentIndexStream;
-
-  // Future<void> playFromSong(SongModel song) async {
-  //   await _player.setAudioSource(
-  //     AudioSource.file(
-  //       song.path,
-  //       tag: MediaItem(
-  //         id: song.path,
-  //         title: song.title,
-  //         artist: song.artist,
-  //         album: song.album,
-  //         duration: Duration(milliseconds: song.duration),
-  //         artUri: song.hasArtwork ? Uri.file(song.artworkPath) : null,
-  //       ),
-  //     ),
-  //   );
-  //   // await _player.setFilePath(song.path);
-  //   await _player.play();
-  // }
 
   Future<void> playQueue(List<SongModel> songs, int startIndex) async {
     final sources = songs.map((song) {
@@ -64,6 +47,25 @@ class ZylosAudioHandler {
 
   Future<void> seekToIndex(int index) async {
     await _player.seek(Duration.zero, index: index);
+  }
+
+  Future<void> setShuffle(bool enabled) async {
+    await _player.setShuffleModeEnabled(enabled);
+    if (enabled) await _player.shuffle();
+  }
+
+  Future<void> setRepeatMode(RepeatMode mode) async {
+    switch (mode) {
+      case RepeatMode.none:
+        await _player.setLoopMode(LoopMode.off);
+        break;
+      case RepeatMode.one:
+        await _player.setLoopMode(LoopMode.one);
+        break;
+      case RepeatMode.all:
+        await _player.setLoopMode(LoopMode.all);
+        break;
+    }
   }
 
   Future<void> stop() async {

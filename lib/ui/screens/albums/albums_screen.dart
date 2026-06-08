@@ -50,26 +50,9 @@ class AlbumsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: .start,
                   children: [
-                    // Expanded(
-                    //   child: Container(
-                    //     decoration: BoxDecoration(
-                    //       color: Theme.of(context).colorScheme.primaryContainer,
-                    //       borderRadius: BorderRadius.circular(12),
-                    //     ),
-                    //     child: Center(
-                    //       child: Icon(
-                    //         Icons.album,
-                    //         size: 48,
-                    //         color: Theme.of(
-                    //           context,
-                    //         ).colorScheme.primaryContainer,
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
                     Expanded(
                       child: ArtworkWidget(
-                        artworkPath: album.artworkPath, // ← see note below
+                        artworkPath: album.artworkPath,
                         size: double.infinity,
                         borderRadius: BorderRadius.circular(12),
                         fallbackIcon: Icons.album,

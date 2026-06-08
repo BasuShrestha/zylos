@@ -4,6 +4,7 @@ import 'package:zylos/data/models/album_model.dart';
 import 'package:zylos/providers/library_provider.dart';
 import 'package:zylos/providers/player_provider.dart';
 import 'package:zylos/ui/screens/now_playing_screen.dart';
+import 'package:zylos/ui/widgets/artwork_widget.dart';
 
 class AlbumDetailScreen extends ConsumerWidget {
   final AlbumModel album;
@@ -38,18 +39,36 @@ class AlbumDetailScreen extends ConsumerWidget {
               tileColor: isCurrentSong
                   ? Theme.of(context).colorScheme.primaryContainer
                   : null,
-              leading: CircleAvatar(
-                backgroundColor: isCurrentSong
-                    ? Theme.of(context).colorScheme.primary
-                    : null,
-                child: isCurrentSong
-                    ? Icon(
-                        isPlaying ? Icons.pause : Icons.play_arrow,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        size: 20,
-                      )
-                    : Text('${index + 1}'),
-              ),
+              leading: isCurrentSong
+                  ? Stack(
+                      children: [
+                        ArtworkWidget(
+                          artworkPath: song.artworkPath,
+                          size: 44,
+                          borderRadius: .circular(6),
+                        ),
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Colors.black45,
+                            borderRadius: .circular(6),
+                          ),
+                          child: Icon(
+                            isPlaying ? Icons.pause : Icons.play_arrow,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ],
+                    )
+                  : ArtworkWidget(
+                      artworkPath: song.artworkPath,
+                      size: 44,
+                      borderRadius: .circular(6),
+                      fallbackIcon: Icons.music_note,
+                      fallbackIconSize: 20,
+                    ),
               title: Text(
                 song.title,
                 maxLines: 1,
@@ -89,60 +108,56 @@ class AlbumDetailScreen extends ConsumerWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 240,
+            expandedHeight: 270,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(album.name, maxLines: 1, overflow: .ellipsis),
-              background: Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: Icon(
-                  Icons.album,
-                  size: 80,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
+              background: ArtworkWidget(
+                artworkPath: album.artworkPath,
+                size: double.infinity,
+                borderRadius: .zero,
+                fallbackIcon: Icons.album,
+                fallbackIconSize: 80,
               ),
             ),
           ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsetsGeometry.fromLTRB(16, 12, 16, 4),
-              child: Row(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: .start,
-                      children: [
-                        Text(
-                          album.artist,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(
-                          album.formattedSongCount,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
-                    ),
+                  Text(
+                    album.name,
+                    maxLines: 1,
+                    overflow: .ellipsis,
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                  if (songsAsync.value?.isNotEmpty == true)
-                    FilledButton.icon(
-                      onPressed: () => ref
-                          .read(playerProvider.notifier)
-                          .playSong(songsAsync.value!, 0),
-                      icon: const Icon(Icons.play_arrow_rounded),
-                      label: const Text('Play All'),
-                    ),
-                  // songsAsync.whenData((songs) {
-                  //       return FilledButton.icon(
-                  //         onPressed: songs.isEmpty
-                  //             ? null
-                  //             : () => ref
-                  //                   .read(playerProvider.notifier)
-                  //                   .playSong(songs, 0),
-                  //         icon: const Icon(Icons.play_arrow_rounded),
-                  //         label: const Text('Play All'),
-                  //       );
-                  //     }).value ??
-                  //     const SizedBox.shrink(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: .start,
+                          children: [
+                            Text(
+                              album.artist,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Text(
+                              album.formattedSongCount,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (songsAsync.value?.isNotEmpty == true)
+                        FilledButton.icon(
+                          onPressed: () => ref
+                              .read(playerProvider.notifier)
+                              .playSong(songsAsync.value!, 0),
+                          icon: const Icon(Icons.play_arrow_rounded),
+                          label: const Text('Play All'),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ),
