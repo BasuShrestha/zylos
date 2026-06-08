@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zylos/ui/widgets/artwork_widget.dart';
 import 'package:zylos/ui/widgets/seek_bar.dart';
 
 import '../../../providers/artwork_color_provider.dart';
 import '../../../providers/player_provider.dart';
+import '../../data/models/player_state_model.dart';
 
 class NowPlayingScreen extends ConsumerWidget {
   const NowPlayingScreen({super.key});
@@ -15,13 +16,14 @@ class NowPlayingScreen extends ConsumerWidget {
     final isPlaying = ref.watch(playerProvider.select((s) => s.isPlaying));
     final hasNext = ref.watch(playerProvider.select((s) => s.hasNext));
     final hasPrevious = ref.watch(playerProvider.select((s) => s.hasPrevious));
+    final isShuffled = ref.watch(playerProvider.select((s) => s.isShuffled));
+    final repeatMode = ref.watch(playerProvider.select((s) => s.repeatMode));
     final colorAsync = ref.watch(artworkColorProvider);
 
     if (song == null) {
       return const Scaffold(body: Center(child: Text('Nothing playing')));
     }
 
-    // Use dynamic color scheme if available, fallback to app theme
     final colorScheme = colorAsync.value ?? Theme.of(context).colorScheme;
 
     return Theme(
@@ -58,11 +60,6 @@ class NowPlayingScreen extends ConsumerWidget {
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: Hero(
-                      // ─────────────────────────────────
-                      // Hero tag matches the one in
-                      // MiniPlayer — Flutter animates
-                      // the artwork between the two screens
-                      // ─────────────────────────────────
                       tag: 'artwork_${song.path}',
                       child: ArtworkWidget(
                         artworkPath: song.artworkPath,
@@ -119,7 +116,40 @@ class NowPlayingScreen extends ConsumerWidget {
               // ── Seek bar ─────────────────────────────
               const SeekBar(),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsetsGeometry.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: .spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () =>
+                          ref.read(playerProvider.notifier).toggleShuffle(),
+                      icon: Icon(
+                        Icons.shuffle_rounded,
+                        color: isShuffled
+                            ? colorScheme.primary
+                            : colorScheme.onSurface.withValues(alpha: 0.4),
+                      ),
+                    ),
+
+                    IconButton(
+                      onPressed: () =>
+                          ref.read(playerProvider.notifier).toggleRepeat(),
+                      icon: Icon(
+                        repeatMode == RepeatMode.one
+                            ? Icons.repeat_one_rounded
+                            : Icons.repeat_rounded,
+                        color: repeatMode != RepeatMode.none
+                            ? colorScheme.primary
+                            : colorScheme.onSurface.withValues(alpha: 0.4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 8),
 
               // ── Controls ─────────────────────────────
               Padding(
