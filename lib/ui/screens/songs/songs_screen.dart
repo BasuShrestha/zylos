@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zylos/providers/artwork_color_provider.dart';
 import 'package:zylos/providers/player_provider.dart';
 import 'package:zylos/ui/screens/now_playing_screen.dart';
 import 'package:zylos/ui/widgets/artwork_widget.dart';
@@ -15,6 +16,7 @@ class SongsScreen extends ConsumerWidget {
 
     final currentSong = ref.watch(playerProvider.select((s) => s.currentSong));
     final isPlaying = ref.watch(playerProvider.select((s) => s.isPlaying));
+    final colosScheme = ref.watch(colorSchemeNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -76,9 +78,7 @@ class SongsScreen extends ConsumerWidget {
               final isCurrentSong = currentSong?.path == song.path;
 
               return ListTile(
-                tileColor: isCurrentSong
-                    ? Theme.of(context).colorScheme.primaryContainer
-                    : null,
+                tileColor: isCurrentSong ? colosScheme.primaryContainer : null,
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(6),
                   child: isCurrentSong
@@ -115,10 +115,7 @@ class SongsScreen extends ConsumerWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: isCurrentSong
-                      ? TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: .w600,
-                        )
+                      ? TextStyle(color: colosScheme.primary, fontWeight: .w600)
                       : null,
                 ),
                 subtitle: Text(
