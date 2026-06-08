@@ -15,7 +15,8 @@ class LibraryRepository {
       album, 
       artist, 
       COUNT(*) as song_count, 
-      SUM(duration) as total_duration 
+      SUM(duration) as total_duration, 
+      MAX(artwork_path) as artwork_path 
       FROM songs 
       GROUP BY album, artist 
       ORDER BY album COLLATE NOCASE ASC

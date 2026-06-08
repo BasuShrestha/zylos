@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zylos/ui/widgets/artwork_widget.dart';
+import 'package:zylos/ui/widgets/seek_bar.dart';
 
+import '../../../providers/artwork_color_provider.dart';
 import '../../../providers/player_provider.dart';
-import '../../ui/widgets/seek_bar.dart';
 
 class NowPlayingScreen extends ConsumerWidget {
   const NowPlayingScreen({super.key});
@@ -13,134 +15,162 @@ class NowPlayingScreen extends ConsumerWidget {
     final isPlaying = ref.watch(playerProvider.select((s) => s.isPlaying));
     final hasNext = ref.watch(playerProvider.select((s) => s.hasNext));
     final hasPrevious = ref.watch(playerProvider.select((s) => s.hasPrevious));
+    final colorAsync = ref.watch(artworkColorProvider);
 
     if (song == null) {
       return const Scaffold(body: Center(child: Text('Nothing playing')));
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.keyboard_arrow_down),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          children: [
-            Text('Now Playing', style: Theme.of(context).textTheme.labelSmall),
-          ],
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+    // Use dynamic color scheme if available, fallback to app theme
+    final colorScheme = colorAsync.value ?? Theme.of(context).colorScheme;
 
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(40),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Icon(
-                      Icons.music_note,
-                      size: 80,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+    return Theme(
+      // Apply dynamic color scheme to this screen only
+      data: Theme.of(context).copyWith(colorScheme: colorScheme),
+      child: Scaffold(
+        backgroundColor: colorScheme.surface,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.keyboard_arrow_down),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Column(
+            children: [
+              Text(
+                'Now Playing',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+            ],
+          ),
+          centerTitle: true,
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // ── Artwork ──────────────────────────────
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(40),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: Hero(
+                      // ─────────────────────────────────
+                      // Hero tag matches the one in
+                      // MiniPlayer — Flutter animates
+                      // the artwork between the two screens
+                      // ─────────────────────────────────
+                      tag: 'artwork_${song.path}',
+                      child: ArtworkWidget(
+                        artworkPath: song.artworkPath,
+                        size: double.infinity,
+                        borderRadius: BorderRadius.circular(20),
+                        fallbackIcon: Icons.music_note,
+                        fallbackIconSize: 80,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          song.title,
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          song.artist,
-                          style: Theme.of(context).textTheme.bodyMedium
-                              ?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.onSurface.withValues(alpha: 0.6),
-                              ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            const SeekBar(),
-
-            const SizedBox(height: 16),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    iconSize: 40,
-                    onPressed: hasPrevious
-                        ? () => ref.read(playerProvider.notifier).previous()
-                        : null,
-                    icon: const Icon(Icons.skip_previous_rounded),
-                  ),
-
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      iconSize: 40,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      onPressed: () =>
-                          ref.read(playerProvider.notifier).togglePlayPause(),
-                      icon: Icon(
-                        isPlaying
-                            ? Icons.pause_rounded
-                            : Icons.play_arrow_rounded,
+              // ── Song info ────────────────────────────
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            song.title,
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme.onSurface,
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            song.artist,
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(
+                                  color: colorScheme.onSurface.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-
-                  IconButton(
-                    iconSize: 40,
-                    onPressed: hasNext
-                        ? () => ref.read(playerProvider.notifier).next()
-                        : null,
-                    icon: const Icon(Icons.skip_next_rounded),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            const SizedBox(height: 32),
-          ],
+              const SizedBox(height: 16),
+
+              // ── Seek bar ─────────────────────────────
+              const SeekBar(),
+
+              const SizedBox(height: 16),
+
+              // ── Controls ─────────────────────────────
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      iconSize: 40,
+                      onPressed: hasPrevious
+                          ? () => ref.read(playerProvider.notifier).previous()
+                          : null,
+                      icon: Icon(
+                        Icons.skip_previous_rounded,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        iconSize: 40,
+                        color: colorScheme.onPrimary,
+                        onPressed: () =>
+                            ref.read(playerProvider.notifier).togglePlayPause(),
+                        icon: Icon(
+                          isPlaying
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      iconSize: 40,
+                      onPressed: hasNext
+                          ? () => ref.read(playerProvider.notifier).next()
+                          : null,
+                      icon: Icon(
+                        Icons.skip_next_rounded,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );

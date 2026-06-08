@@ -11,6 +11,7 @@ class SongModel {
   final int fileSize;
   final int dateAdded;
   final int trackNumber;
+  final String artworkPath;
 
   const SongModel({
     required this.id,
@@ -23,6 +24,7 @@ class SongModel {
     required this.fileSize,
     required this.dateAdded,
     required this.trackNumber,
+    required this.artworkPath,
   });
 
   factory SongModel.fromMap(Map<String, dynamic> map) {
@@ -37,6 +39,7 @@ class SongModel {
       fileSize: map['file_size'] as int,
       dateAdded: map['date_added'] as int,
       trackNumber: map['track_number'] as int,
+      artworkPath: map['artwork_path'] as String? ?? '',
     );
   }
 
@@ -51,8 +54,12 @@ class SongModel {
       'file_size': fileSize,
       'date_added': dateAdded,
       'track_number': trackNumber,
+      'artwork_path': artworkPath,
     };
   }
+
+  bool get hasArtwork =>
+      artworkPath.isNotEmpty && File(artworkPath).existsSync();
 
   String get formattedDuration {
     final d = Duration(milliseconds: duration);

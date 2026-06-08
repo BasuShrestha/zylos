@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zylos/ui/screens/now_playing_screen.dart';
 
 import '../../providers/player_provider.dart';
+import 'artwork_widget.dart';
 
 class MiniPlayer extends ConsumerWidget {
   const MiniPlayer({super.key});
@@ -14,7 +15,6 @@ class MiniPlayer extends ConsumerWidget {
     final position = ref.watch(playerProvider.select((s) => s.position));
     final duration = ref.watch(playerProvider.select((s) => s.duration));
 
-    // Hide mini player when nothing is playing
     if (song == null) return const SizedBox.shrink();
 
     final progress = duration.inMilliseconds == 0
@@ -22,16 +22,13 @@ class MiniPlayer extends ConsumerWidget {
         : position.inMilliseconds / duration.inMilliseconds;
 
     return GestureDetector(
-      onTap: () {
-        // Open full Now Playing screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const NowPlayingScreen(),
-            fullscreenDialog: true,
-          ),
-        );
-      },
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const NowPlayingScreen(),
+          fullscreenDialog: true,
+        ),
+      ),
       child: Container(
         margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
         decoration: BoxDecoration(
@@ -48,7 +45,6 @@ class MiniPlayer extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Progress line at top of mini player ─
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(12),
@@ -59,29 +55,22 @@ class MiniPlayer extends ConsumerWidget {
                 backgroundColor: Colors.transparent,
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
               child: Row(
                 children: [
-                  // Artwork placeholder
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
+                  // ── Artwork with hero tag ──────────
+                  Hero(
+                    tag: 'artwork_${song.path}',
+                    child: ArtworkWidget(
+                      artworkPath: song.artworkPath,
+                      size: 44,
                       borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Icon(
-                      Icons.music_note,
-                      size: 20,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      fallbackIcon: Icons.music_note,
+                      fallbackIconSize: 20,
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
-                  // Song info
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,15 +92,11 @@ class MiniPlayer extends ConsumerWidget {
                       ],
                     ),
                   ),
-
-                  // Previous
                   IconButton(
                     icon: const Icon(Icons.skip_previous_rounded),
                     onPressed: () =>
                         ref.read(playerProvider.notifier).previous(),
                   ),
-
-                  // Play / Pause
                   IconButton(
                     icon: Icon(
                       isPlaying
@@ -121,8 +106,6 @@ class MiniPlayer extends ConsumerWidget {
                     onPressed: () =>
                         ref.read(playerProvider.notifier).togglePlayPause(),
                   ),
-
-                  // Next
                   IconButton(
                     icon: const Icon(Icons.skip_next_rounded),
                     onPressed: () => ref.read(playerProvider.notifier).next(),

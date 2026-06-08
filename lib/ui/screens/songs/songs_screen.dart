@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zylos/providers/player_provider.dart';
 import 'package:zylos/ui/screens/now_playing_screen.dart';
+import 'package:zylos/ui/widgets/artwork_widget.dart';
 
 import '../../../providers/song_provider.dart';
 
@@ -17,7 +18,7 @@ class SongsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zylos'),
+        title: const Text('All Songs'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -78,19 +79,35 @@ class SongsScreen extends ConsumerWidget {
                 tileColor: isCurrentSong
                     ? Theme.of(context).colorScheme.primaryContainer
                     : null,
-                leading: CircleAvatar(
-                  backgroundColor: isCurrentSong
-                      ? Theme.of(context).colorScheme.primary
-                      : null,
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
                   child: isCurrentSong
-                      ? Icon(
-                          isPlaying ? Icons.pause : Icons.play_arrow,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          size: 20,
+                      ? Stack(
+                          children: [
+                            ArtworkWidget(
+                              artworkPath: song.artworkPath,
+                              size: 44,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: Colors.black45,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Icon(
+                                isPlaying ? Icons.pause : Icons.play_arrow,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ],
                         )
-                      : Text(
-                          song.title[0].toUpperCase(),
-                          style: const TextStyle(fontSize: 14),
+                      : ArtworkWidget(
+                          artworkPath: song.artworkPath,
+                          size: 44,
+                          borderRadius: BorderRadius.circular(6),
                         ),
                 ),
                 title: Text(
