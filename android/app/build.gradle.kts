@@ -2,11 +2,10 @@ plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    id("kotlin-android")
 }
 
 val keyPropertiesFile = rootProject.file("app/key.properties");
-val keyProperties = java.util.Properties()
+val keyProperties = java.utils.Properties()
 if (keyPropertiesFile.exists()) {
     keyProperties.load(java.io.FileInputStream(keyPropertiesFile))
 }
@@ -21,8 +20,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    kotlinOptions {
+        jvmTarget = "17"
     }
 
     defaultConfig {
