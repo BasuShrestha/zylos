@@ -6,13 +6,12 @@ class DBService {
 
   static Future<void> init() async {
     if (_db != null) return;
-
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'zylos.db');
 
     _db = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -38,6 +37,8 @@ class DBService {
     await db.execute('CREATE INDEX idx_title  ON songs(title  COLLATE NOCASE)');
     await db.execute('CREATE INDEX idx_artist ON songs(artist COLLATE NOCASE)');
     await db.execute('CREATE INDEX idx_album  ON songs(album  COLLATE NOCASE)');
+
+    await _createPlaylistTables(db);
   }
 
   static Future<void> _onUpgrade(
@@ -50,6 +51,32 @@ class DBService {
         'ALTER TABLE songs ADD COLUMN artwork_path TEXT NOT NULL DEFAULT ""',
       );
     }
+    if (oldVersion < 3) {
+      await _createPlaylistTables(db);
+    }
+  }
+
+  static Future<void> _createPlaylistTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS playlists (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )
+    ''');
+
+    await db.execute(''' 
+      CREATE TABLE IF NOT EXISTS playlist_songs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        playlist_id INTEGER NOT NULL,
+        song_id INTEGER NOT NULL,
+        position INTEGER NOT NULL,
+        FOREIGN KEY (playlist_id) REFERENCES playlists(id) ON DELETE CASCADE,
+        FOREIGN KEY (song_id) REFERENCES songs(id) ON DELETE CASCADE,
+        UNIQUE (playlist_id, song_id)
+      )
+    ''');
   }
 
   static Database get instance {

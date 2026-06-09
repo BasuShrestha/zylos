@@ -41,11 +41,34 @@ class LibraryRepository {
       SELECT 
         artist,
         Count(*) as song_count,
-        COUNT(DISTINCT album) as album_count 
-        FROM songs 
+        COUNT(DISTINCT album) as album_count,
+        -- Pick artwork from the most recently added song 
+        -- COALESCE skips empty strings and picks first non-empty
+        artwork_path as artwork_path  
+        FROM songs s1
+        WHERE date_added = (
+          SELECT MAX(s2.date_added)
+          FROM songs s2 
+          WHERE s2.artist = s1.artist 
+          AND s2.artwork_path != ""
+        )
         GROUP BY artist 
         ORDER BY artist COLLATE NOCASE ASC
     ''');
+    if (rows.isEmpty) {
+      final fallback = await _db.rawQuery('''
+      SELECT 
+        artist,
+        COUNT(*) as song_count,
+        COUNT(DISTINCT album) as album_count,
+        MAX(artwork_path) as artwork_path
+        FROM songs 
+        GROUP BY artist 
+        ORDER BY artist COLLATE NOCASE ASC
+      ''');
+      return fallback.map(ArtistModel.fromMap).toList();
+    }
+
     return rows.map(ArtistModel.fromMap).toList();
   }
 

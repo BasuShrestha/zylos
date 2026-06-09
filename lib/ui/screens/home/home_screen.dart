@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:zylos/ui/screens/albums/albums_screen.dart';
 import 'package:zylos/ui/screens/artists/artists_screen.dart';
 import 'package:zylos/ui/screens/genres/genres_screen.dart';
+import 'package:zylos/ui/screens/playlists/playlists_screen.dart';
 import 'package:zylos/ui/screens/search/search_screen.dart';
 import 'package:zylos/ui/screens/songs/songs_screen.dart';
 import 'package:zylos/ui/widgets/mini_player.dart';
@@ -18,6 +19,7 @@ class HomeScreen extends ConsumerWidget {
     AlbumsScreen(),
     ArtistsScreen(),
     GenresScreen(),
+    PlaylistsScreen(),
   ];
 
   @override
@@ -68,6 +70,11 @@ class HomeScreen extends ConsumerWidget {
             icon: Icon(Icons.queue_music_outlined),
             selectedIcon: Icon(Icons.queue_music),
             label: 'Genres',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.playlist_play_outlined),
+            selectedIcon: Icon(Icons.playlist_play),
+            label: 'Playlists',
           ),
         ],
       ),
