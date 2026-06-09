@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zylos/ui/widgets/artwork_widget.dart';
 
 import '../../../providers/library_provider.dart';
 import 'artist_detail_screen.dart';
@@ -37,11 +38,12 @@ class ArtistsScreen extends ConsumerWidget {
               final artist = artists[index];
 
               return ListTile(
-                leading: CircleAvatar(
-                  child: Text(
-                    artist.name[0].toUpperCase(),
-                    style: const TextStyle(fontSize: 14),
-                  ),
+                leading: ArtworkWidget(
+                  artworkPath: artist.artworkPath,
+                  size: 48,
+                  borderRadius: .circular(24),
+                  fallbackIcon: Icons.person,
+                  fallbackIconSize: 24,
                 ),
                 title: Text(
                   artist.name,

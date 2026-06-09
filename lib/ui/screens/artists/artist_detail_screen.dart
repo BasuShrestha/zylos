@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zylos/ui/screens/now_playing_screen.dart';
+import 'package:zylos/ui/widgets/artwork_widget.dart';
 
 import '../../../data/models/artist_model.dart';
 import '../../../providers/library_provider.dart';
@@ -105,13 +106,12 @@ class ArtistDetailScreen extends ConsumerWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              background: Container(
-                color: Theme.of(context).colorScheme.secondaryContainer,
-                child: Icon(
-                  Icons.person,
-                  size: 80,
-                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                ),
+              background: ArtworkWidget(
+                artworkPath: artist.artworkPath,
+                size: double.infinity,
+                borderRadius: .zero,
+                fallbackIcon: Icons.percent,
+                fallbackIconSize: 80,
               ),
             ),
           ),
