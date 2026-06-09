@@ -55,7 +55,10 @@ jobs:
           echo "android.newDsl=false" >> android/gradle.properties
 
       - name: Build release APK
-        run: flutter build apk --release
+        run: |
+          flutter build apk --release --split-per-abi \
+            --obfuscate \
+            --split-debug-info=build/debug-info
 
       - name: Get version
         id: version
@@ -71,7 +74,12 @@ jobs:
           body: |
             Automated release from commit ${{ github.sha }}
 
-            **Install:** Download `app-release.apk` below and install on your Android device.
+            **Which APK to install:**
+            - Most phones (2018+): `app-arm64-v8a-release.apk`
+            - Older phones: `app-armeabi-v7a-release.apk`
+            - Emulators: `app-x86_64-release.apk`
+
+            # **Install:** Download `app-release.apk` below and install on your Android device.
             Enable "Install from unknown sources" in your device settings first.
           files: build/app/outputs/flutter-apk/app-release.apk
           draft: false
