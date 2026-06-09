@@ -1,0 +1,68 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.1"
+          channel: "stable"
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEY_STORE_BASE64 }}" | base64 --decode > android/app/zylos.jks
+
+      - name: Create key.properties
+        run: |
+          echo "storePassword=${{ secrets.KEY_STORE_PASSWORD }}" > android/app/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/app/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/app/key.properties
+          echo "storeFile=zylos.jks" >> android/app/key.properties
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      # ─────────────────────────────────────────
+      # Auto-increment version using commit count
+      # Each push to main bumps the build number
+      # ─────────────────────────────────────────
+      - name: Get version
+        id: version
+        run: |
+          BUILD_NUMBER=$(git rev-list --count HEAD)
+          echo "version=1.0.$BUILD_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Zylos v${{ steps.version.outputs.version }}
+          body: |
+            Automated release from commit ${{ github.sha }}
+
+            **Install:** Download `app-release.apk` below and install on your Android device.
+            Enable "Install from unknown sources" in your device settings first.
+          files: build/app/outputs/flutter-apk/app-release.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

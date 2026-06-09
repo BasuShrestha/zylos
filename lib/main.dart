@@ -16,7 +16,7 @@ Future<void> main() async {
   // await DBService.clearSongs();
 
   await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.example.zylos.audio',
+    androidNotificationChannelId: 'com.basu.zylos.audio',
     androidNotificationChannelName: 'Zylos Music',
     androidNotificationOngoing: true,
     androidStopForegroundOnPause: true,
