@@ -5,7 +5,7 @@ plugins {
 }
 
 val keyPropertiesFile = rootProject.file("app/key.properties");
-val keyProperties = java.utils.Properties()
+val keyProperties = java.util.Properties()
 if (keyPropertiesFile.exists()) {
     keyProperties.load(java.io.FileInputStream(keyPropertiesFile))
 }
