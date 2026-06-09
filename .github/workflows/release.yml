@@ -75,13 +75,16 @@ jobs:
             Automated release from commit ${{ github.sha }}
 
             **Which APK to install:**
-            - Most phones (2018+): `app-arm64-v8a-release.apk`
-            - Older phones: `app-armeabi-v7a-release.apk`
+            - Most phones (2018+): `app-arm64-v8a-release.apk` (64-bit)
+            - Older phones: `app-armeabi-v7a-release.apk` (32-bit)
             - Emulators: `app-x86_64-release.apk`
 
             # **Install:** Download `app-release.apk` below and install on your Android device.
             Enable "Install from unknown sources" in your device settings first.
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: |
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
           draft: false
           prerelease: false
         env:
