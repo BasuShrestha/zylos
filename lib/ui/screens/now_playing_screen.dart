@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide RepeatMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zylos/ui/widgets/artwork_widget.dart';
+import 'package:zylos/ui/widgets/queue_sheet.dart';
 import 'package:zylos/ui/widgets/seek_bar.dart';
 
 import '../../../providers/player_provider.dart';
@@ -33,22 +34,23 @@ class NowPlayingScreen extends ConsumerWidget {
           icon: const Icon(Icons.keyboard_arrow_down),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Column(
-          children: [
-            Text(
-              'Now Playing',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
-            ),
-          ],
+        title: Text(
+          'Now Playing',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () => showQueueSheet(context, ref),
+            icon: const Icon(Icons.queue_music_rounded),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            // ── Artwork ──────────────────────────────
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(40),
@@ -68,7 +70,6 @@ class NowPlayingScreen extends ConsumerWidget {
               ),
             ),
 
-            // ── Song info ────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
@@ -108,7 +109,6 @@ class NowPlayingScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            // ── Seek bar ─────────────────────────────
             const SeekBar(),
 
             const SizedBox(height: 8),
@@ -146,7 +146,6 @@ class NowPlayingScreen extends ConsumerWidget {
 
             const SizedBox(height: 8),
 
-            // ── Controls ─────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
