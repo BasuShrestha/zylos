@@ -4,6 +4,7 @@ import 'package:zylos/data/models/album_model.dart';
 import 'package:zylos/providers/library_provider.dart';
 import 'package:zylos/providers/player_provider.dart';
 import 'package:zylos/ui/screens/now_playing_screen.dart';
+import 'package:zylos/ui/widgets/add_to_playlist_sheet.dart';
 import 'package:zylos/ui/widgets/artwork_widget.dart';
 
 class AlbumDetailScreen extends ConsumerWidget {
@@ -36,6 +37,7 @@ class AlbumDetailScreen extends ConsumerWidget {
             final isCurrentSong = currentSong?.path == song.path;
 
             return ListTile(
+              onLongPress: () => showAddToPlaylistSheet(context, ref, song),
               tileColor: isCurrentSong
                   ? Theme.of(context).colorScheme.primaryContainer
                   : null,

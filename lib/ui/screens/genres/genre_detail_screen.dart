@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zylos/ui/screens/now_playing_screen.dart';
+import 'package:zylos/ui/widgets/add_to_playlist_sheet.dart';
 
 import '../../../data/models/genre_model.dart';
 import '../../../providers/library_provider.dart';
@@ -63,6 +64,7 @@ class GenreDetailScreen extends ConsumerWidget {
               final isCurrentSong = currentSong?.path == song.path;
 
               return ListTile(
+                onLongPress: () => showAddToPlaylistSheet(context, ref, song),
                 tileColor: isCurrentSong
                     ? Theme.of(context).colorScheme.primaryContainer
                     : null,
